@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff7fa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Princess Study">
+<meta name="description" content="毎日の勉強を優雅に記録する、淡いピンクの学習管理アプリ。">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<title>Princess Study Diary</title>
+<style>
+:root{--ink:#80576b;--muted:#ad8798;--rose:#b77d96;--rose2:#d8aabd;--line:#ead4de;--paper:#fffafb;--bg:#fff6f9;--gold:#c5a16b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#fff7fa,#f9edf2);color:var(--ink);font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;padding:0 0 env(safe-area-inset-bottom)}
+button,input,select{font:inherit}button{cursor:pointer}
+.shell{max-width:760px;margin:auto;padding:18px 15px 42px}
+.hero{text-align:center;padding:12px 4px 18px}.ornament{font-size:12px;letter-spacing:.27em;color:var(--gold)}h1{font-weight:400;font-style:italic;font-size:clamp(28px,7vw,39px);margin:8px 0 3px;color:#a66f87}.subtitle{font-size:12px;color:var(--muted);font-style:italic}
+.date-line{margin-top:13px;font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:8px;background:#f3e5eb;padding:5px;border-radius:15px;margin-bottom:14px}.tab{flex:1;border:0;background:transparent;color:var(--ink);padding:11px 5px;border-radius:11px;font-size:13px}.tab.active{background:#fffafb;box-shadow:0 2px 9px #c69aab30;color:#a66f87}
+.card{background:rgba(255,251,252,.94);border:1px solid var(--line);border-radius:19px;padding:17px;margin:12px 0;box-shadow:0 5px 18px #a9788c0b}
+h2{font-size:19px;font-weight:400;font-style:italic;margin:0 0 13px;color:#a66f87}.small{font-size:12px;color:var(--muted)}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}
+label{font-size:13px;color:#986d80}.field{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff7fa;color:var(--ink);min-width:0;outline-color:var(--rose2)}
+.btn{border:0;border-radius:12px;padding:11px 14px;background:#f2e2e9;color:#93677b;font-size:13px}.btn.primary{background:var(--rose);color:white}.btn.ghost{background:#fff7fa;border:1px solid var(--line)}.btn:disabled{opacity:.45}
+.progress{height:10px;background:#f0e1e8;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;background:linear-gradient(90deg,#c58ca4,#dfb5c5);border-radius:99px;width:0;transition:width .25s}
+.big{font-size:36px;font-variant-numeric:tabular-nums;color:#a66f87}.percent{font-size:26px;color:#a66f87}
+.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.subject-chip{border:1px solid var(--line);background:#fff7fa;border-radius:12px;padding:11px;text-align:left;color:var(--ink);font-size:13px}.subject-chip.selected{background:#f0dfe7;border-color:#c995aa}
+.task{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #f2e5eb;font-size:14px}.task:last-child{border:0}.task input{width:19px;height:19px;accent-color:#b77d96;flex:none}.task.done span{text-decoration:line-through;color:#bd9eac}.delete{border:0;background:none;color:#c49aaa;padding:5px;font-size:17px}
+.timer-face{text-align:center;padding:12px 0}.timer-time{font-size:clamp(48px,13vw,68px);letter-spacing:2px;font-variant-numeric:tabular-nums;color:#a66f87}.timer-mode{font-size:12px;letter-spacing:.18em;color:var(--muted)}.timer-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hidden{display:none!important}.record-line{display:grid;grid-template-columns:50px 1fr 78px;gap:9px;align-items:center;font-size:13px;margin:12px 0}.mini-bar{height:7px;background:#f0e1e8;border-radius:99px;overflow:hidden}.mini-bar span{display:block;height:100%;background:#c58ca4}
+.footer{text-align:center;color:#b18b9b;font-size:11px;padding:17px 5px;font-style:italic}
+@media(min-width:600px){.subject-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="hero">
+<div class="ornament">✧ THE ROYAL STUDY ROOM ✧</div>
+<h1>Princess Study Diary</h1>
+<div class="subtitle">A little progress every day ♡</div>
+<div class="date-line" id="todayLabel"></div>
+</header>
+<nav class="tabs" aria-label="メインメニュー">
+<button class="tab active" data-tab="plan">♡ Study Plan</button>
+<button class="tab" data-tab="timer">✧ Timer</button>
+<button class="tab" data-tab="record">❀ Records</button>
+</nav>
+
+<section id="planPage">
+<div class="card stack">
+<div class="row"><h2>Today's Progress</h2><span class="percent" id="taskPercent">0%</span></div>
+<div class="progress"><span id="taskProgress"></span></div>
+<div class="row small"><span id="taskDone">0 completed</span><span id="taskCount">0 tasks</span></div>
+</div>
+<div class="card stack">
+<h2>♡ Add your study plan</h2>
+<label for="planDate">Study date</label><input class="field" type="date" id="planDate">
+<label>Subject / 教科</label>
+<div class="subject-grid" id="subjectChoices"></div>
+<label for="taskText">Study task / 勉強する内容</label>
+<div class="row"><input class="field" id="taskText" placeholder="例：ワークの12〜15ページ"><button class="btn primary" id="addTask">＋ Add</button></div>
+</div>
+<div class="card stack">
+<div class="row"><h2>♡ My Checklist</h2><span class="small" id="planDateText"></span></div>
+<div id="taskLists"></div>
+</div>
+</section>
+
+<section id="timerPage" class="hidden">
+<div class="card stack">
+<h2>♡ Study Timer</h2>
+<div class="row">
+<button class="btn primary" id="stopwatchMode">⏱ Stopwatch</button>
+<button class="btn" id="pomodoroMode">🍅 Pomodoro</button>
+</div>
+<div class="timer-face">
+<div class="timer-mode" id="timerPhase">STOPWATCH</div>
+<div class="timer-time" id="timerDisplay">00:00:00</div>
+<div class="small" id="timerHint">Your study time starts here ♡</div>
+</div>
+<label for="timerSubject">Studying subject</label>
+<select class="field" id="timerSubject"><option>国語</option><option>数学</option><option>英語</option><option>理科</option><option>社会</option></select>
+<div id="pomSettings" class="hidden row">
+<label>勉強（分）<input class="field" type="number" id="focusMinutes" min="1" max="180" value="25"></label>
+<label>休憩（分）<input class="field" type="number" id="restMinutes" min="1" max="60" value="5"></label>
+</div>
+<div class="timer-controls">
+<button class="btn primary" id="timerStart">▶ Start</button>
+<button class="btn" id="timerPause" disabled>Ⅱ Pause</button>
+<button class="btn" id="timerReset">↻ Reset</button>
+</div>
+<div class="small" id="timerStatus" role="status" aria-live="polite">Ready when you are, princess ♡</div>
+</div>
+<div class="card stack">
+<h2>♡ Today's Goal</h2>
+<div class="row"><label for="goalHours">Daily target (hours)</label><input class="field" style="width:100px" type="number" id="goalHours" min=".25" max="24" step=".25" value="2"></div>
+<div class="row"><span class="big" id="goalTotal">00:00</span><span class="percent" id="goalPercent">0%</span></div>
+<div class="progress"><span id="goalProgress"></span></div>
+<div class="small" id="goalMessage">Little by little, you can do it ♡</div>
+</div>
+</section>
+
+<section id="recordPage" class="hidden">
+<div class="card stack">
+<h2>❀ Today's Study Records</h2>
+<label for="recordDate">記録を見る日</label><input class="field" type="date" id="recordDate">
+<div class="row"><span class="small">Total study time</span><strong id="recordGrandTotal">00:00:00</strong></div>
+<div id="subjectRecords"></div>
+</div>
+<div class="card stack">
+<h2>♡ Data & Notes</h2>
+<p class="small">予定・チェック状態・勉強時間は、このiPhoneのブラウザ内に保存されます。同じブラウザで開けば続きから使えます。</p>
+<button class="btn ghost" id="exportData">データを書き出す</button>
+<label class="btn ghost" for="importFile" style="text-align:center">バックアップを読み込む</label><input class="hidden" type="file" id="importFile" accept="application/json">
+<button class="btn" id="clearDay">選択日の勉強時間記録を削除</button>
+</div>
+</section>
+<div class="footer">✧ Made for a hardworking princess ✧<br>Every little effort blooms ♡</div>
+</main>
+<script src="./app.js"></script>
+</body></html>
